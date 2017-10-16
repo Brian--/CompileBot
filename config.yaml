@@ -1,0 +1,6 @@
+token: 'replaceme'
+
+bot:
+  plugins:
+        - plugins.tutorial
+        - plugins.compile
