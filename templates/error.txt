@@ -1,0 +1,5 @@
+{{ mention }}
+
+{{ error }}
+{% if helpcmd %} Try my `{{ helpcmd }}` command for more information
+{% endif %}

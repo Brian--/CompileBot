@@ -1,9 +1,11 @@
 {{ mention }}
-{% for o in result.output %}  ``` {{ o }} ```  {% else %}
+{% for o in result.output %}```
+{{ o }}```{% else %}
 (no output)
 {% endfor %}
 {% for e in result.error %}{% if e: %}
-``` {{ e }} ```{% endif %}{% endfor %}
-Computed in {{ result.time }} seconds, using {{ result.memory|filesizeformat(binary=true) }} memory.
+```
+{{ e }}```{% endif %}{% endfor %}
+Computed in {{ result.time|sum }} seconds, using {{ result.memory|sum|filesizeformat(binary=true) }} memory.
 {% if result.message: %}
 Additional compilation message: ` {{ result.message }} `{% endif %}

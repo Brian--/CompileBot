@@ -4,24 +4,6 @@ from jinja2 import Environment, FileSystemLoader
 
 KEY = 'hackerrank|2064922-1979|6cef8989650eee47a3b67fb1e4a691c30a7afa29'
 
-MSG_FMT = '''
-{mention}
-
-```
-{output}
-```
-
-Computed in {time} seconds, using {memory} memory.
-
-Additional message: ` {message}`
-'''
-
-MSG_ERR = '''
-{mention}
-
-`{lang}` is not a valid language
-Try my `languages` command
-'''
 
 class CompilePlugin(Plugin):
 
@@ -35,36 +17,50 @@ class CompilePlugin(Plugin):
 
     @Plugin.command('run', '<src:str...>')
     def on_run_command(self, event, src):
-        split_src = src.split('```')
-        lang = split_src[0].strip()
+        tokens = list((x.strip() for x in src.split('```') if x.strip()))
+        lang = tokens[0]
+        args = tokens[1:-1] or ['']
+        source = tokens[-1]
 
         if lang not in self.compiler.supportedlanguages():
-            event.msg.reply(MSG_ERR.format(
+            event.msg.reply(self.err_out.render(
                 mention=event.msg.member.user.mention,
-                lang=lang))
+                error=lang + ' is not a valid language',
+                helpcmd='languages'), tts=True)
             return
 
-        source = split_src[1]
+        if len(tokens) < 2:
+            event.msg.reply(self.err_out.render(
+                mention=event.msg.member.user.mention,
+                error='You must include source to compile.',
+                helpcmd='help'), tts=True)
+            return
+
         result = self.compiler.run({
             'source': source,
-            'lang': lang})
+            'lang': lang,
+            'testcases': args})
 
-        event.msg.reply()
-        # event.msg.reply(MSG_FMT.format(
-        #     mention=event.msg.member.user.mention,
-        #     output=result.output[0],
-        #     time=result.time[0],
-        #     memory=humanfriendly.format_size(result.memory[0], binary=True),
-        #     message=result.message))
+        if not result:
+            event.msg.reply(self.err_out.render(
+                mention=event.msg.member.user.mention,
+                error='Something weird happened, result object is falsy',
+                helpcmd='.`<@195428466450104329>`.'))
+
+        event.msg.reply(self.res_out.render(
+            mention=event.msg.member.user.mention,
+            result=result))
+
+        print(self.res_out.render(
+            mention=event.msg.member.user.mention,
+            result=result))
 
     @Plugin.command('languages')
     def on_lang_command(self, event):
         event.msg.reply('• ' + '\n• '.join(
             self.compiler.supportedlanguages()))
 
-    @Plugin.command('tts', '<input:str...>')
-    def on_test_command(self, event, input):
-        event.msg.reply(input, tts=True)
-
-    # @Plugin.command('test')
-    # def on_test_command(self, event):
+    @Plugin.command('help')
+    def on_help_command(self, event):
+        event.msg.reply(self.help_out.render(
+            mention=event.msg.member.user.mention))
