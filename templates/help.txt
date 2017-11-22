@@ -1,0 +1,10 @@
+Commands (executed by mentioning the bot and giving a command):
+
+• help
+  *you found it*
+
+• languages
+  *a list of supported languages (some may be untested)*
+
+• run [lang] [code block]
+  *compiles and runs [lang] code given in [code block] and replies the result. Code blocks are created by starting with ``` on the first line after [lang], and having another set as the last line of your message.*

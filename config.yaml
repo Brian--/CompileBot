@@ -4,3 +4,5 @@ bot:
   plugins:
         - plugins.tutorial
         - plugins.compile
+        - plugins.music
+        - plugins.rolemanage
